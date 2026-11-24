@@ -7,7 +7,7 @@ type: explainer
 category: travel
 tags: [basics, access, flights, entry-requirements]
 author: daiki-ito
-publishedAt: 2026-11-23
+publishedAt: 2026-11-24
 heroImage: ../../images/placeholder.jpg
 heroAlt: "仮画像"
 heroCredit: "仮画像"
@@ -53,7 +53,7 @@ sources:
     url: "https://www.interieur.gouv.fr/actualites/actualites-du-ministere/se-reconstruire-apres-chido-et-dikeledi-bilan-detape-a-mayotte"
   - title: "Département de Mayotte: Historique"
     url: "https://www.mayotte.fr/le-departement/fonctionnement-institutionnel/historique"
-draft: true
+draft: false
 ---
 
 マヨット（Mayotte）は、モザンビーク海峡の北東の入り口、マダガスカルのすぐ近くに位置する島で、コモロ諸島を構成する4つの島のひとつです。フランスの一部ではありますが、パリやリヨンへ行くよりも少しだけ準備が必要です。アジアからの直行便はなく、空港は本島とは別の小さな島にあり、入域のルールもフランス本土とは異なります。このガイドでは、ひとつずつ順に見ていきます。

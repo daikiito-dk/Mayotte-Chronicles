@@ -7,7 +7,7 @@ type: explainer
 category: culture
 tags: [basics, languages, shimaore, kibushi]
 author: daiki-ito
-publishedAt: 2026-11-23
+publishedAt: 2026-11-24
 heroImage: ../../images/placeholder.jpg
 heroAlt: "Placeholder image"
 heroCredit: "Placeholder image"
@@ -26,7 +26,7 @@ sources:
     url: "https://www.education.gouv.fr/bo/21/Hebdo47/MENE2136384C.htm"
   - title: "Ministère de la Culture, DAC Mayotte: Appel à projets, valorisation des langues régionales de Mayotte (July 28, 2023)"
     url: "https://www.culture.gouv.fr/regions/dac-mayotte/les-actualites/Appel-a-projets-Valorisation-des-langues-regionales-de-Mayotte"
-draft: true
+draft: false
 ---
 
 Ask which language people speak in Mayotte, and the honest answer is: several. French is the official language and the language of school. Most people born on the island also speak Shimaore, a Bantu language, and many speak Kibushi, a language of the Malagasy family. Arabic is heard in mosques and Quranic schools, and the languages of the neighbouring Comorian islands are spoken in many homes. This article offers a first map of that landscape.

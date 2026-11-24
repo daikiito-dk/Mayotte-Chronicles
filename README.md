@@ -4,7 +4,7 @@ Mayotte（マヨット）に特化した、日本語・フランス語・英語�
 
 - 仕様・方針: [SPEC.md](./SPEC.md)
 - 公開 URL: https://daikiito-dk.github.io/Mayotte-Chronicles/
-- 状態: サイト公開済み。最初の記事 3 本はレビュー中（下書き）
+- 状態: サイト公開済み。最初の記事 3 本を日本語・フランス語・英語で公開中
 
 ## 開発
 

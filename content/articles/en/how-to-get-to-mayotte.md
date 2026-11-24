@@ -7,7 +7,7 @@ type: explainer
 category: travel
 tags: [basics, access, flights, entry-requirements]
 author: daiki-ito
-publishedAt: 2026-11-23
+publishedAt: 2026-11-24
 heroImage: ../../images/placeholder.jpg
 heroAlt: "Placeholder image"
 heroCredit: "Placeholder image"
@@ -52,7 +52,7 @@ sources:
     url: "https://www.interieur.gouv.fr/actualites/actualites-du-ministere/se-reconstruire-apres-chido-et-dikeledi-bilan-detape-a-mayotte"
   - title: "Département de Mayotte: Historique"
     url: "https://www.mayotte.fr/le-departement/fonctionnement-institutionnel/historique"
-draft: true
+draft: false
 ---
 
 Mayotte lies at the north-eastern entrance to the Mozambique Channel, close to Madagascar, and is one of the four islands of the Comoros archipelago. It is part of France, yet getting there takes a little more planning than a trip to Paris or Lyon. There is no direct flight from Asia, the airport sits on a small island separate from the main one, and the entry rules are not the same as in mainland France. This guide takes each step in turn.

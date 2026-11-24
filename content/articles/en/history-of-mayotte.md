@@ -7,7 +7,7 @@ type: explainer
 category: history
 tags: [basics, history, timeline]
 author: daiki-ito
-publishedAt: 2026-11-23
+publishedAt: 2026-11-24
 heroImage: ../../images/placeholder.jpg
 heroAlt: "Placeholder image"
 heroCredit: "Placeholder image"
@@ -48,7 +48,7 @@ sources:
     url: "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000052075804"
   - title: "info.gouv.fr: Reconstruire Mayotte, la refondation"
     url: "https://www.info.gouv.fr/reconstruire-mayotte/la-refondation"
-draft: true
+draft: false
 ---
 
 Mayotte is often described in a single line: France's 101st department, in the Indian Ocean. That line is accurate, but it leaves out almost everything interesting. The island's past runs through Swahili trade, a sultanate, Malagasy migrations, a colonial cession, and a series of votes in which its inhabitants made a choice different from that of the rest of the Comoros archipelago. This article follows that story, up to the natural and political events of recent years.
