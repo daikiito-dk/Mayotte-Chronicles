@@ -1,0 +1,172 @@
+---
+import type { PublicLang } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+import { langPath } from '../lib/urls';
+import { site } from '../config/site';
+
+interface Props {
+  lang: PublicLang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<section
+  class="cookie-banner"
+  aria-labelledby="cookie-title"
+  hidden
+  data-cookie-banner
+  data-ga-id={site.gaMeasurementId}
+  data-host={site.productionHost}
+  data-key={site.consentStorageKey}
+>
+  <div class="inner">
+    <h2 id="cookie-title">{t['cookie.title']}</h2>
+    <p>
+      {t['cookie.body']}
+      <a href={langPath(lang, 'privacy')}>{t['cookie.policy']}</a>
+    </p>
+    <div class="actions">
+      <button type="button" class="button" data-consent="granted">{t['cookie.accept']}</button>
+      <button type="button" class="button" data-consent="denied">{t['cookie.reject']}</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  export {};
+
+  type Choice = 'granted' | 'denied';
+
+  declare global {
+    interface Window {
+      dataLayer: unknown[];
+      gtag: (...args: unknown[]) => void;
+    }
+  }
+
+  const banner = document.querySelector<HTMLElement>('[data-cookie-banner]');
+
+  if (banner) {
+    const { gaId = '', host = '', key = 'mc-consent' } = banner.dataset;
+    // Analytics never runs in `astro dev` / `astro preview`, only on the real public host.
+    const analyticsEnabled = location.hostname === host;
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function gtag() {
+      // gtag.js requires the `arguments` object itself, not an array copy.
+      // eslint-disable-next-line prefer-rest-params
+      window.dataLayer.push(arguments);
+    };
+    window.gtag('consent', 'default', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied',
+    });
+
+    let loaded = false;
+    const loadAnalytics = () => {
+      if (loaded || !analyticsEnabled || !gaId) return;
+      loaded = true;
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaId)}`;
+      document.head.appendChild(script);
+      window.gtag('js', new Date());
+      window.gtag('config', gaId);
+    };
+
+    const removeAnalyticsCookies = () => {
+      const domains = ['', location.hostname, `.${location.hostname}`];
+      for (const name of document.cookie.split(';').map((c) => c.split('=')[0]!.trim())) {
+        if (!name.startsWith('_ga')) continue;
+        for (const domain of domains) {
+          document.cookie = `${name}=; Max-Age=0; path=/${domain ? `; domain=${domain}` : ''}`;
+        }
+      }
+    };
+
+    const readChoice = (): Choice | null => {
+      try {
+        const value = localStorage.getItem(key);
+        return value === 'granted' || value === 'denied' ? value : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const apply = (choice: Choice) => {
+      window.gtag('consent', 'update', { analytics_storage: choice });
+      if (choice === 'granted') loadAnalytics();
+      else removeAnalyticsCookies();
+    };
+
+    const show = () => {
+      banner.hidden = false;
+      banner.querySelector<HTMLButtonElement>('[data-consent]')?.focus({ preventScroll: true });
+    };
+
+    const saved = readChoice();
+    if (saved) apply(saved);
+    else banner.hidden = false;
+
+    banner.querySelectorAll<HTMLButtonElement>('[data-consent]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const choice = button.dataset.consent as Choice;
+        try {
+          localStorage.setItem(key, choice);
+        } catch {
+          // Storage can be blocked; the choice then lasts for this page only.
+        }
+        const wasGranted = loaded;
+        apply(choice);
+        banner.hidden = true;
+        // gtag.js cannot be unloaded, so a reload guarantees no further hits after withdrawal.
+        if (choice === 'denied' && wasGranted) location.reload();
+      });
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('[data-cookie-settings]').forEach((button) => {
+      button.addEventListener('click', show);
+    });
+  }
+</script>
+
+<style>
+  .cookie-banner {
+    position: fixed;
+    inset: auto 1rem 1rem 1rem;
+    z-index: 50;
+    max-width: 40rem;
+    margin-inline: auto;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.15);
+  }
+  .cookie-banner[hidden] {
+    display: none;
+  }
+  .inner {
+    padding: 1.25rem 1.5rem;
+  }
+  h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+  }
+  p {
+    margin: 0 0 1rem;
+    font-size: 0.925rem;
+    line-height: 1.6;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .actions .button {
+    flex: 1 1 8rem;
+  }
+</style>

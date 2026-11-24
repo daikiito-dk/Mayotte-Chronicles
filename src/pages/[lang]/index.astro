@@ -1,0 +1,124 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { categories, publicLangs, type PublicLang } from '../../i18n/config';
+import { categoryNames, useTranslations } from '../../i18n/ui';
+import { getVisibleArticles } from '../../lib/articles';
+import { langPath } from '../../lib/urls';
+
+export const getStaticPaths = (() => publicLangs.map((lang) => ({ params: { lang } }))) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as PublicLang;
+const t = useTranslations(lang);
+const articles = await getVisibleArticles(lang);
+const explainers = articles.filter((a) => a.data.type === 'explainer').slice(0, 3);
+const explainerIds = new Set(explainers.map((a) => a.id));
+const latest = articles.filter((a) => !explainerIds.has(a.id)).slice(0, 6);
+---
+
+<BaseLayout lang={lang}>
+  <section class="hero">
+    <div class="container">
+      <h1>Mayotte Chronicles</h1>
+      <p class="tagline">{t['site.tagline']}</p>
+    </div>
+  </section>
+
+  <div class="container">
+    {
+      articles.length === 0 ? (
+        <section class="empty" aria-labelledby="empty-title">
+          <h2 id="empty-title">{t['home.emptyTitle']}</h2>
+          <p>{t['home.emptyBody']}</p>
+          <a class="button" href={langPath(lang, 'about')}>
+            {t['home.emptyLink']}
+          </a>
+        </section>
+      ) : (
+        <>
+          {explainers.length > 0 && (
+            <section aria-labelledby="start-title">
+              <div class="section-title">
+                <h2 id="start-title">{t['home.startHere']}</h2>
+              </div>
+              <div class="grid">
+                {explainers.map((a) => (
+                  <ArticleCard article={a} lang={lang} />
+                ))}
+              </div>
+            </section>
+          )}
+          {latest.length > 0 && (
+            <section aria-labelledby="latest-title">
+              <div class="section-title">
+                <h2 id="latest-title">{t['home.latest']}</h2>
+                <a href={langPath(lang, 'articles')}>{t['home.viewAll']}</a>
+              </div>
+              <div class="grid">
+                {latest.map((a) => (
+                  <ArticleCard article={a} lang={lang} />
+                ))}
+              </div>
+            </section>
+          )}
+        </>
+      )
+    }
+
+    <section aria-labelledby="topics-title">
+      <div class="section-title">
+        <h2 id="topics-title">{t['home.categories']}</h2>
+      </div>
+      <ul class="topics">
+        {
+          categories.map((c) => (
+            <li>
+              <a href={langPath(lang, 'category', c)}>{categoryNames[lang][c]}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .hero {
+    background: linear-gradient(135deg, var(--lagoon-dark), var(--lagoon) 60%, #2f8f86);
+    color: #fff;
+    padding: 3.5rem 0 3rem;
+  }
+  .hero h1 {
+    color: #fff;
+    margin: 0;
+  }
+  .tagline {
+    max-width: 38rem;
+    margin: 0.75rem 0 0;
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: #f2fbf9;
+  }
+  .topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .topics a {
+    display: inline-block;
+    padding: 0.5rem 1.1rem;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .topics a:hover {
+    border-color: var(--lagoon);
+    color: var(--lagoon);
+  }
+</style>

@@ -1,0 +1,77 @@
+---
+import type { PublicLang } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+import { filePath, langPath } from '../lib/urls';
+import { site } from '../config/site';
+
+interface Props {
+  lang: PublicLang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<footer class="site-footer">
+  <div class="container inner">
+    <div>
+      <p class="name">{site.name}</p>
+      <p class="muted note">{t['footer.note']}</p>
+    </div>
+    <ul>
+      <li><a href={langPath(lang, 'about')}>{t['nav.about']}</a></li>
+      <li><a href={langPath(lang, 'contact')}>{t['nav.contact']}</a></li>
+      <li><a href={langPath(lang, 'privacy')}>{t['nav.privacy']}</a></li>
+      <li><a href={filePath(lang, 'rss.xml')}>{t['nav.rss']}</a></li>
+      <li><button type="button" class="link-button" data-cookie-settings>{t['nav.cookieSettings']}</button></li>
+    </ul>
+  </div>
+  <div class="container copy muted">© 2026 {site.name}</div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 5rem;
+    background: var(--paper);
+    border-top: 1px solid var(--line);
+    padding: 2rem 0 1.5rem;
+    font-size: 0.925rem;
+  }
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+  .name {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 1.15rem;
+    margin: 0;
+  }
+  .note {
+    margin: 0.25rem 0 0;
+  }
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .link-button {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: var(--lagoon);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+    cursor: pointer;
+  }
+  .copy {
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+  }
+</style>

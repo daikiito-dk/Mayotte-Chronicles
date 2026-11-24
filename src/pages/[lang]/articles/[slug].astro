@@ -1,0 +1,246 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ArticleCard from '../../../components/ArticleCard.astro';
+import { getLanguage, isPublicLang, type PublicLang } from '../../../i18n/config';
+import { categoryNames, formatDate, sourceLangNames, tagName, useTranslations } from '../../../i18n/ui';
+import { getTranslations, getVisibleArticles, readingMinutes, type Article } from '../../../lib/articles';
+import { langPath } from '../../../lib/urls';
+import { authors } from '../../../data/authors';
+
+export const getStaticPaths = (async () => {
+  const articles = await getVisibleArticles();
+  return articles
+    .filter((entry) => isPublicLang(entry.data.lang))
+    .map((entry) => ({ params: { lang: entry.data.lang, slug: entry.data.translationKey }, props: { entry } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  entry: Article;
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const lang = data.lang as PublicLang;
+const t = useTranslations(lang);
+const intl = getLanguage(lang).intl!;
+const { Content } = await render(entry);
+const author = authors[data.author];
+
+const translations = await getTranslations(entry);
+const alternates = Object.fromEntries(
+  Object.keys(translations).map((l) => [l, langPath(l as PublicLang, 'articles', data.translationKey)]),
+);
+const original = data.translatedFrom ? translations[data.translatedFrom] : undefined;
+
+const related = (await getVisibleArticles(lang))
+  .filter((a) => a.id !== entry.id && a.data.category === data.category)
+  .slice(0, 3);
+
+const isoDate = (d: Date) => d.toISOString().slice(0, 10);
+---
+
+<BaseLayout lang={lang} title={data.title} description={data.description} alternates={alternates} ogImage={data.heroImage} ogType="article">
+  <article>
+    <header class="narrow head">
+      <a class="eyebrow" href={langPath(lang, 'category', data.category)}>{categoryNames[lang][data.category]}</a>
+      {data.draft && <p class="draft">{t['article.draft']}</p>}
+      <h1>{data.title}</h1>
+      <p class="lead">{data.description}</p>
+      <p class="meta muted">
+        <span>{t['article.by']} <a href={langPath(lang, 'about')}>{author.name}</a></span>
+        <span>{t['article.published']} <time datetime={isoDate(data.publishedAt)}>{formatDate(data.publishedAt, intl)}</time></span>
+        {
+          data.updatedAt && (
+            <span>
+              {t['article.updated']} <time datetime={isoDate(data.updatedAt)}>{formatDate(data.updatedAt, intl)}</time>
+            </span>
+          )
+        }
+        <span>{t['article.readingTime'](readingMinutes(entry.body, lang))}</span>
+      </p>
+      {
+        data.translatedFrom && (
+          <p class="notice">
+            {t['article.translated'](sourceLangNames[lang][data.translatedFrom])}
+            {original && (
+              <>
+                {' '}
+                <a href={langPath(data.translatedFrom, 'articles', data.translationKey)} hreflang={data.translatedFrom}>
+                  {t['article.readOriginal']}
+                </a>
+              </>
+            )}
+          </p>
+        )
+      }
+    </header>
+
+    <figure class="hero container">
+      <Image src={data.heroImage} alt={data.heroAlt} widths={[640, 1024, 1600]} sizes="(min-width: 72rem) 72rem, 100vw" loading="eager" fetchpriority="high" />
+      <figcaption class="muted">{t['article.photo']}: {data.heroCredit}</figcaption>
+    </figure>
+
+    <div class="narrow prose">
+      <Content />
+    </div>
+
+    <footer class="narrow end">
+      {
+        data.sources.length > 0 && (
+          <section aria-labelledby="sources-title">
+            <h2 id="sources-title">{t['article.sources']}</h2>
+            <ol class="sources">
+              {data.sources.map((s) => (
+                <li>
+                  <a href={s.url} rel="noopener">
+                    {s.title}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )
+      }
+      {
+        data.corrections.length > 0 && (
+          <section aria-labelledby="corrections-title">
+            <h2 id="corrections-title">{t['article.corrections']}</h2>
+            <ul>
+              {data.corrections.map((c) => (
+                <li>
+                  <time datetime={isoDate(c.date)}>{formatDate(c.date, intl)}</time>: {c.note}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+      {
+        data.tags.length > 0 && (
+          <section aria-labelledby="tags-title">
+            <h2 id="tags-title" class="visually-hidden">
+              {t['article.tags']}
+            </h2>
+            <ul class="tags">
+              {data.tags.map((tag) => (
+                <li>
+                  <a href={langPath(lang, 'tags', tag)}>#{tagName(lang, tag)}</a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+      <section class="author" aria-label={author.name}>
+        <Image src={author.photo} alt={author.name} width={96} height={96} class="avatar" />
+        <div>
+          <p class="author-name"><a href={langPath(lang, 'about')}>{author.name}</a></p>
+          <p class="muted">{author.role[lang]}</p>
+        </div>
+      </section>
+    </footer>
+  </article>
+
+  {
+    related.length > 0 && (
+      <section class="container" aria-labelledby="related-title">
+        <div class="section-title">
+          <h2 id="related-title">{t['article.related']}</h2>
+        </div>
+        <div class="grid">
+          {related.map((a) => (
+            <ArticleCard article={a} lang={lang} />
+          ))}
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .head {
+    padding-top: 3rem;
+  }
+  .lead {
+    font-size: 1.2rem;
+    color: var(--muted);
+    margin: 0 0 1rem;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+  .notice {
+    margin: 1.25rem 0 0;
+    padding: 0.75rem 1rem;
+    background: var(--lagoon-tint);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+  }
+  .draft {
+    display: inline-block;
+    margin: 0 0 0 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: var(--ylang);
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+  }
+  .hero {
+    margin-block: 2rem 2.5rem;
+  }
+  .hero :global(img) {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: var(--radius);
+  }
+  figcaption {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+  }
+  .end {
+    margin-top: 3rem;
+    border-top: 1px solid var(--line);
+  }
+  .sources {
+    font-size: 0.925rem;
+    padding-left: 1.4rem;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+  }
+  .author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding: 1.25rem;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .author :global(.avatar) {
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .author p {
+    margin: 0;
+  }
+  .author-name {
+    font-weight: 700;
+  }
+</style>

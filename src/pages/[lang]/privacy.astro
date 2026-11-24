@@ -1,0 +1,38 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { publicLangs, type PublicLang } from '../../i18n/config';
+import { useTranslations } from '../../i18n/ui';
+import { privacy } from '../../i18n/pages';
+
+export const getStaticPaths = (() => publicLangs.map((lang) => ({ params: { lang } }))) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as PublicLang;
+const t = useTranslations(lang);
+const c = privacy[lang];
+---
+
+<BaseLayout lang={lang} title={t['privacy.title']}>
+  <div class="narrow page">
+    <h1>{t['privacy.title']}</h1>
+    <p class="muted">{c.updated}</p>
+    <p>{c.intro}</p>
+    {
+      c.sections.map((s) => (
+        <section>
+          <h2>{s.heading}</h2>
+          {s.paragraphs.map((p) => (
+            <p>{p}</p>
+          ))}
+        </section>
+      ))
+    }
+    <p><button type="button" class="button" data-cookie-settings>{t['nav.cookieSettings']}</button></p>
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-top: 3rem;
+  }
+</style>

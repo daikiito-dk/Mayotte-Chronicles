@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { publicLangs } from '../i18n/config';
+import { ui } from '../i18n/ui';
+import { path } from '../lib/urls';
+
+const alternates = Object.fromEntries(publicLangs.map((l) => [l, path(l)]));
+const order = ['en', 'fr', 'ja'] as const;
+---
+
+<BaseLayout lang="en" title={ui.en['notFound.title']} alternates={alternates} noindex>
+  <div class="narrow page">
+    {
+      order.map((l) => (
+        <section lang={l}>
+          <h1>{ui[l]['notFound.title']}</h1>
+          <p>{ui[l]['notFound.body']}</p>
+          <p>
+            <a class="button" href={path(l)}>
+              {ui[l]['notFound.home']}
+            </a>
+          </p>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-top: 3rem;
+  }
+  section + section {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+  h1 {
+    font-size: 1.6rem;
+  }
+</style>

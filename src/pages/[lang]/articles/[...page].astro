@@ -1,0 +1,59 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ArticleCard from '../../../components/ArticleCard.astro';
+import { publicLangs, type PublicLang } from '../../../i18n/config';
+import { useTranslations } from '../../../i18n/ui';
+import { getVisibleArticles } from '../../../lib/articles';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const pages = await Promise.all(
+    publicLangs.map(async (lang) => paginate(await getVisibleArticles(lang), { params: { lang }, pageSize: 12 })),
+  );
+  return pages.flat();
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+const lang = Astro.params.lang as PublicLang;
+const t = useTranslations(lang);
+---
+
+<BaseLayout lang={lang} title={t['list.title']}>
+  <div class="container">
+    <div class="section-title">
+      <h1>{t['list.title']}</h1>
+    </div>
+    {
+      page.data.length === 0 ? (
+        <p class="empty">{t['list.empty']}</p>
+      ) : (
+        <div class="grid">
+          {page.data.map((a) => (
+            <ArticleCard article={a} lang={lang} headingLevel="h2" />
+          ))}
+        </div>
+      )
+    }
+    {
+      page.lastPage > 1 && (
+        <nav class="pagination" aria-label={t['list.page'](page.currentPage, page.lastPage)}>
+          {page.url.prev ? <a href={page.url.prev}>← {t['list.prev']}</a> : <span />}
+          <span class="muted">{t['list.page'](page.currentPage, page.lastPage)}</span>
+          {page.url.next ? <a href={page.url.next}>{t['list.next']} →</a> : <span />}
+        </nav>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin: 0;
+  }
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+</style>

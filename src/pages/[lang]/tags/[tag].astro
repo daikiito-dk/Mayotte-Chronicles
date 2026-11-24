@@ -1,0 +1,54 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ArticleCard from '../../../components/ArticleCard.astro';
+import { publicLangs, type PublicLang } from '../../../i18n/config';
+import { tagName, useTranslations } from '../../../i18n/ui';
+import { getVisibleArticles, type Article } from '../../../lib/articles';
+import { langPath } from '../../../lib/urls';
+
+export const getStaticPaths = (async () => {
+  const paths = [];
+  for (const lang of publicLangs) {
+    const articles = await getVisibleArticles(lang);
+    const tags = [...new Set(articles.flatMap((a) => a.data.tags))];
+    for (const tag of tags) {
+      paths.push({ params: { lang, tag }, props: { articles: articles.filter((a) => a.data.tags.includes(tag)) } });
+    }
+  }
+  return paths;
+}) satisfies GetStaticPaths;
+
+interface Props {
+  articles: Article[];
+}
+
+const lang = Astro.params.lang as PublicLang;
+const tag = Astro.params.tag!;
+const { articles } = Astro.props;
+const t = useTranslations(lang);
+const name = tagName(lang, tag);
+
+// A tag page only exists in languages that have articles with this tag.
+const alternates: Partial<Record<PublicLang, string>> = {};
+for (const l of publicLangs) {
+  if ((await getVisibleArticles(l)).some((a) => a.data.tags.includes(tag))) alternates[l] = langPath(l, 'tags', tag);
+}
+---
+
+<BaseLayout lang={lang} title={t['tag.title'](name)} alternates={alternates}>
+  <div class="container">
+    <div class="section-title">
+      <h1>{t['tag.title'](name)}</h1>
+    </div>
+    <div class="grid">
+      {articles.map((a) => <ArticleCard article={a} lang={lang} headingLevel="h2" />)}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin: 0;
+  }
+</style>

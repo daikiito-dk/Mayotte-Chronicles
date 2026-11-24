@@ -1,0 +1,116 @@
+---
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import { categories, type PublicLang } from '../i18n/config';
+import { categoryNames, useTranslations } from '../i18n/ui';
+import { langPath } from '../lib/urls';
+
+interface Props {
+  lang: PublicLang;
+  alternates: Partial<Record<PublicLang, string>>;
+}
+
+const { lang, alternates } = Astro.props;
+const t = useTranslations(lang);
+const current = Astro.url.pathname;
+---
+
+<a class="skip-link" href="#main">{t['nav.skip']}</a>
+<header class="site-header">
+  <div class="container top">
+    <a class="logo" href={langPath(lang)} aria-label={`Mayotte Chronicles, ${t['nav.home']}`}>
+      <span class="logo-main">Mayotte</span>
+      <span class="logo-sub">Chronicles</span>
+    </a>
+    <LanguageSwitcher lang={lang} alternates={alternates} />
+  </div>
+  <nav class="container categories" aria-label={t['nav.categories']}>
+    <ul>
+      <li>
+        <a href={langPath(lang, 'articles')} aria-current={current.startsWith(langPath(lang, 'articles')) ? 'page' : undefined}>
+          {t['nav.articles']}
+        </a>
+      </li>
+      {
+        categories.map((c) => {
+          const href = langPath(lang, 'category', c);
+          return (
+            <li>
+              <a href={href} aria-current={current === href ? 'page' : undefined}>
+                {categoryNames[lang][c]}
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 100;
+    background: var(--paper);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+  }
+  .skip-link:focus {
+    top: 1rem;
+  }
+  .site-header {
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    padding: 1.25rem 0 0.75rem;
+  }
+  .logo {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    text-decoration: none;
+    color: var(--ink);
+    font-family: var(--font-serif);
+    line-height: 1;
+  }
+  .logo-main {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--lagoon);
+  }
+  .logo-sub {
+    font-size: 1.75rem;
+    font-style: italic;
+  }
+  .categories ul {
+    display: flex;
+    gap: 0.25rem 1.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem 0 0.75rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: thin;
+  }
+  .categories a {
+    display: inline-block;
+    padding: 0.35rem 0;
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+  }
+  .categories a:hover,
+  .categories a[aria-current='page'] {
+    color: var(--lagoon);
+    border-bottom-color: var(--ylang);
+  }
+</style>

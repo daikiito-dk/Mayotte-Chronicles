@@ -1,0 +1,83 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { publicLangs, type PublicLang } from '../../i18n/config';
+import { useTranslations } from '../../i18n/ui';
+import { about } from '../../i18n/pages';
+import { authors } from '../../data/authors';
+
+export const getStaticPaths = (() => publicLangs.map((lang) => ({ params: { lang } }))) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as PublicLang;
+const t = useTranslations(lang);
+const c = about[lang];
+const author = authors['daiki-ito'];
+---
+
+<BaseLayout lang={lang} title={t['about.title']} description={c.lead}>
+  <div class="narrow page">
+    <h1>{t['about.title']}</h1>
+    <p class="lead">{c.lead}</p>
+
+    <h2>{c.mission.heading}</h2>
+    {c.mission.paragraphs.map((p) => <p>{p}</p>)}
+    {c.mission.list && <ul>{c.mission.list.map((item) => <li>{item}</li>)}</ul>}
+
+    <h2>{c.author}</h2>
+    <section class="author" aria-label={author.name}>
+      <Image src={author.photo} alt={author.name} width={240} height={240} class="avatar" />
+      <div>
+        <p class="name">{author.name}</p>
+        <p class="muted role">{author.role[lang]}</p>
+        <p>{author.bio[lang]}</p>
+      </div>
+    </section>
+
+    <h2>{c.editorial.heading}</h2>
+    {c.editorial.list && <ul>{c.editorial.list.map((item) => <li>{item}</li>)}</ul>}
+
+    <h2>{c.languages.heading}</h2>
+    {c.languages.paragraphs.map((p) => <p>{p}</p>)}
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-top: 3rem;
+  }
+  .lead {
+    font-size: 1.2rem;
+    color: var(--muted);
+  }
+  .author {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+  .author :global(.avatar) {
+    width: 8rem;
+    height: 8rem;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .name {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin: 0;
+  }
+  .role {
+    margin: 0 0 0.75rem;
+  }
+  @media (max-width: 36rem) {
+    .author {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

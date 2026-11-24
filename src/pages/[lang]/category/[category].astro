@@ -1,0 +1,43 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ArticleCard from '../../../components/ArticleCard.astro';
+import { categories, publicLangs, type Category, type PublicLang } from '../../../i18n/config';
+import { categoryNames, useTranslations } from '../../../i18n/ui';
+import { getVisibleArticles } from '../../../lib/articles';
+
+export const getStaticPaths = (() =>
+  publicLangs.flatMap((lang) => categories.map((category) => ({ params: { lang, category } })))) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as PublicLang;
+const category = Astro.params.category as Category;
+const t = useTranslations(lang);
+const name = categoryNames[lang][category];
+const articles = (await getVisibleArticles(lang)).filter((a) => a.data.category === category);
+---
+
+<BaseLayout lang={lang} title={name} description={t['category.intro'](name)}>
+  <div class="container">
+    <div class="section-title">
+      <h1>{t['category.title'](name)}</h1>
+    </div>
+    <p class="muted">{t['category.intro'](name)}</p>
+    {
+      articles.length === 0 ? (
+        <p class="empty">{t['list.empty']}</p>
+      ) : (
+        <div class="grid">
+          {articles.map((a) => (
+            <ArticleCard article={a} lang={lang} headingLevel="h2" />
+          ))}
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin: 0;
+  }
+</style>

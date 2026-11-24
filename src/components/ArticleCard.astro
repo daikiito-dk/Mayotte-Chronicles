@@ -1,0 +1,78 @@
+---
+import { Image } from 'astro:assets';
+import type { Article } from '../lib/articles';
+import { getLanguage, type PublicLang } from '../i18n/config';
+import { categoryNames, formatDate, useTranslations } from '../i18n/ui';
+import { langPath } from '../lib/urls';
+
+interface Props {
+  article: Article;
+  lang: PublicLang;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { article, lang, headingLevel = 'h3' } = Astro.props;
+const { data } = article;
+const t = useTranslations(lang);
+const Heading = headingLevel;
+const href = langPath(lang, 'articles', data.translationKey);
+---
+
+<article class="card">
+  <a href={href} class="image-link" tabindex="-1" aria-hidden="true">
+    <Image src={data.heroImage} alt="" widths={[400, 800]} sizes="(min-width: 72rem) 22rem, (min-width: 40rem) 45vw, 100vw" />
+  </a>
+  <a class="eyebrow" href={langPath(lang, 'category', data.category)}>{categoryNames[lang][data.category]}</a>
+  {data.draft && <span class="draft">{t['article.draft']}</span>}
+  <Heading class="title"><a href={href}>{data.title}</a></Heading>
+  <p class="description">{data.description}</p>
+  <p class="date muted">
+    <time datetime={data.publishedAt.toISOString().slice(0, 10)}>{formatDate(data.publishedAt, getLanguage(lang).intl!)}</time>
+  </p>
+</article>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .image-link img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: var(--radius);
+    margin-bottom: 0.5rem;
+  }
+  .title {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+  .title a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .title a:hover {
+    color: var(--lagoon);
+    text-decoration: underline;
+  }
+  .description {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  .date {
+    margin: 0;
+    font-size: 0.85rem;
+  }
+  .draft {
+    align-self: flex-start;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: var(--ylang);
+    color: var(--ink);
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+  }
+</style>

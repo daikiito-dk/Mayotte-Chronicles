@@ -1,0 +1,68 @@
+---
+import { languages, isPublicLang, type PublicLang } from '../i18n/config';
+import { useTranslations } from '../i18n/ui';
+
+interface Props {
+  lang: PublicLang;
+  alternates: Partial<Record<PublicLang, string>>;
+}
+
+const { lang, alternates } = Astro.props;
+const t = useTranslations(lang);
+// Public languages without a version of this page are omitted; coming-soon languages are always listed, unlinked (SPEC 3.1).
+const items = languages.filter((l) => l.status === 'coming-soon' || (isPublicLang(l.code) && alternates[l.code]));
+---
+
+<nav class="lang" aria-label={t['lang.label']}>
+  <ul>
+    {
+      items.map((l) =>
+        l.status === 'public' && isPublicLang(l.code) ? (
+          <li>
+            <a href={alternates[l.code]} hreflang={l.code} lang={l.code} aria-current={l.code === lang ? 'true' : undefined}>
+              {l.name}
+            </a>
+          </li>
+        ) : (
+          <li>
+            <span class="soon" aria-disabled="true" lang={l.code}>
+              {l.name} <small lang="en">({t['lang.comingSoon']})</small>
+            </span>
+          </li>
+        ),
+      )
+    }
+  </ul>
+</nav>
+
+<style>
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.9rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.875rem;
+  }
+  a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--lagoon);
+    text-decoration: underline;
+  }
+  a[aria-current='true'] {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .soon {
+    color: var(--muted);
+    opacity: 0.85;
+    cursor: default;
+  }
+  .soon small {
+    font-size: 0.75rem;
+  }
+</style>
