@@ -7,7 +7,7 @@ type: explainer
 category: history
 tags: [basics, history, timeline]
 author: daiki-ito
-publishedAt: 2026-11-23
+publishedAt: 2026-11-24
 heroImage: ../../images/placeholder.jpg
 heroAlt: "仮画像"
 heroCredit: "仮画像"
@@ -49,7 +49,7 @@ sources:
     url: "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000052075804"
   - title: "info.gouv.fr: Reconstruire Mayotte, la refondation"
     url: "https://www.info.gouv.fr/reconstruire-mayotte/la-refondation"
-draft: true
+draft: false
 ---
 
 マヨット（Mayotte）は、よく一行で説明されます。「インド洋にある、フランスの101番目の県」。この説明は正確ですが、興味深いことのほとんどが抜け落ちています。この島の過去には、スワヒリの交易、スルタン国、マダガスカルからの移住、植民地時代の割譲、そして住民たちがコモロ諸島のほかの島々とは異なる選択をした一連の投票が含まれています。この記事では、近年の自然災害や政治の動きまで、その歩みをたどります。

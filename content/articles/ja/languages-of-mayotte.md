@@ -7,7 +7,7 @@ type: explainer
 category: culture
 tags: [basics, languages, shimaore, kibushi]
 author: daiki-ito
-publishedAt: 2026-11-23
+publishedAt: 2026-11-24
 heroImage: ../../images/placeholder.jpg
 heroAlt: "仮画像"
 heroCredit: "仮画像"
@@ -27,7 +27,7 @@ sources:
     url: "https://www.education.gouv.fr/bo/21/Hebdo47/MENE2136384C.htm"
   - title: "Ministère de la Culture, DAC Mayotte: Appel à projets, valorisation des langues régionales de Mayotte (July 28, 2023)"
     url: "https://www.culture.gouv.fr/regions/dac-mayotte/les-actualites/Appel-a-projets-Valorisation-des-langues-regionales-de-Mayotte"
-draft: true
+draft: false
 ---
 
 マヨット（Mayotte）では何語が話されているのか。そう尋ねられたら、正直な答えは「いくつもの言語」です。フランス語は公用語であり、学校の言語でもあります。島で生まれた人の多くは、バントゥー系の言語であるシマオレ語（Shimaore）も話し、マダガスカル語の仲間であるキブシ語（Kibushi）を話す人も少なくありません。モスクやコーラン学校ではアラビア語が聞こえ、多くの家庭では近隣のコモロの島々の言葉が話されています。この記事では、そうした言語の風景を大まかに描いてみます。
